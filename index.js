@@ -1,5 +1,11 @@
 const express = require("express");
+const morgan = require("morgan");
+
 const app = express();
+
+morgan.token("body", (req, res) => {
+  return Object.keys(req.body).length ? JSON.stringify(req.body) : "";
+});
 
 const PORT = 3001;
 const MAX_ID = 999999;
@@ -28,6 +34,9 @@ let phonebook = [
 ];
 
 app.use(express.json());
+app.use(
+  morgan(":method :url :status :res[content-length] - :response-time ms :body")
+);
 
 app.get("/info", (req, res) => {
   const reqDate = new Date();
@@ -85,6 +94,12 @@ app.delete("/api/persons/:id", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: "Unknown endpoint" });
+};
+
+app.use(unknownEndpoint);
 
 const generateId = () => {
   return Math.floor(Math.random() * MAX_ID);
