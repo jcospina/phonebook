@@ -10,6 +10,7 @@ morgan.token("body", (req, res) => {
 
 const PORT = process.env.PORT || 3001;
 const MAX_ID = 999999;
+const baseUrl = "/api/persons";
 
 let phonebook = [
   {
@@ -40,6 +41,8 @@ app.use(
   morgan(":method :url :status :res[content-length] - :response-time ms :body")
 );
 
+app.use(express.static("build"));
+
 app.get("/info", (req, res) => {
   const reqDate = new Date();
   const infoPage = `
@@ -48,11 +51,11 @@ app.get("/info", (req, res) => {
   res.send(infoPage);
 });
 
-app.get("/api/persons", (req, res) => {
+app.get(baseUrl, (req, res) => {
   res.json(phonebook);
 });
 
-app.get("/api/persons/:id", (req, res) => {
+app.get(`${baseUrl}/:id`, (req, res) => {
   const id = +req.params.id;
   const person = phonebook.find((person) => person.id === id);
   if (person) {
@@ -64,7 +67,7 @@ app.get("/api/persons/:id", (req, res) => {
     .end();
 });
 
-app.post("/api/persons", (req, res) => {
+app.post(baseUrl, (req, res) => {
   const body = req.body;
   if (!body.name || !body.number) {
     return res.status(400).json({
@@ -87,7 +90,7 @@ app.post("/api/persons", (req, res) => {
   res.json(newPerson);
 });
 
-app.delete("/api/persons/:id", (req, res) => {
+app.delete(`${baseUrl}/:id`, (req, res) => {
   const id = +req.params.id;
   phonebook = phonebook.filter((person) => person.id !== id);
   return res.status(204).end();
