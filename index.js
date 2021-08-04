@@ -1,5 +1,6 @@
 const express = require("express");
 const morgan = require("morgan");
+const cors = require("cors");
 
 const app = express();
 
@@ -7,7 +8,7 @@ morgan.token("body", (req, res) => {
   return Object.keys(req.body).length ? JSON.stringify(req.body) : "";
 });
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 const MAX_ID = 999999;
 
 let phonebook = [
@@ -33,6 +34,7 @@ let phonebook = [
   },
 ];
 
+app.use(cors());
 app.use(express.json());
 app.use(
   morgan(":method :url :status :res[content-length] - :response-time ms :body")
